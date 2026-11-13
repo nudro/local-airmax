@@ -1,0 +1,17 @@
+# Pinned so a later install on this Mac matches the version this app was written for.
+flask==3.1.3
+mlx==0.32.4
+mlx-lm==0.32.2
+pandas==3.1.1
+openpyxl==3.1.5
+pypdf==7.0.1
+semantic-router[fastembed]==1.1.2
+fastembed==0.9.1
+sentence-transformers==6.3.0
+safetensors==0.8.0
+numpy==2.5.4
+huggingface_hub==1.33.0
+# pydantic-ai-slim is the PydanticAI library. The full pydantic-ai package also installs cloud providers this app does not use.
+pydantic-ai-slim==2.68.0
+ddgs==9.16.1
+beautifulsoup4==4.15.0

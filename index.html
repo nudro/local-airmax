@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local AirMax</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --teal: #14c4c4;
+      --teal-deep: #0e8f96;
+      --paper: #ffffff;
+      --line: #e6e6e6;
+      --amber: #b86e00;
+      --amber-bg: #fff6e8;
+      --green: #0f7a45;
+      --green-bg: #e8f7ef;
+    }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+    }
+    .brand-header {
+      background: var(--ink);
+      color: white;
+    }
+    .wordmark {
+      font-weight: 750;
+      letter-spacing: -0.03em;
+      font-size: 1.65rem;
+      line-height: 1;
+    }
+    .product-line {
+      color: var(--teal);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .code-caption {
+      color: #d7d7d7;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.75rem;
+    }
+    .code-caption span {
+      color: var(--teal);
+    }
+    .stat-value {
+      color: var(--teal);
+      font-weight: 700;
+      font-size: 1.55rem;
+    }
+    .stat-label {
+      color: #bdbdbd;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    a.black-button {
+      text-decoration: none;
+    }
+    .black-button, .header-button {
+      background: var(--ink);
+      color: white;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      padding: 0.7rem 1rem;
+      font-weight: 650;
+    }
+    .header-button {
+      background: transparent;
+      border-color: white;
+    }
+    .header-button.stop-button {
+      border-color: #ffb4b4;
+      color: #ffd0d0;
+    }
+    .header-button:disabled {
+      opacity: 0.35;
+    }
+    .black-button:disabled {
+      opacity: 0.45;
+    }
+    .line-button {
+      background: white;
+      color: var(--ink);
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      padding: 0.7rem 1rem;
+      font-weight: 650;
+    }
+    .task-card {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: white;
+      padding: 0.85rem 1rem;
+    }
+    .task-card.selected {
+      border-color: var(--teal-deep);
+      background: #e7fbfb;
+      box-shadow: inset 3px 0 0 var(--teal);
+    }
+    .workspace {
+      border: 1px solid var(--line);
+      background: white;
+    }
+    .privacy-pill {
+      border-radius: 999px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 650;
+    }
+    .privacy-offline {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .privacy-search {
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+    .airmax-power {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: transparent;
+      color: white;
+      padding: 0.4rem 0.8rem 0.4rem 0.45rem;
+      min-width: 15rem;
+      text-align: left;
+    }
+    .airmax-power .mark {
+      width: 2.35rem;
+      height: 1.3rem;
+      border-radius: 999px;
+      background: #3a3a3a;
+      position: relative;
+      flex: none;
+    }
+    .airmax-power .mark i {
+      position: absolute;
+      top: 0.16rem;
+      left: 0.16rem;
+      width: 0.98rem;
+      height: 0.98rem;
+      border-radius: 999px;
+      background: #bdbdbd;
+    }
+    .airmax-power .words {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .airmax-power strong {
+      font-size: 0.95rem;
+    }
+    .airmax-power small {
+      color: #bdbdbd;
+      font-size: 0.68rem;
+      font-weight: 500;
+    }
+    .airmax-power.is-on {
+      border-color: var(--teal);
+      background: rgba(20, 196, 196, 0.16);
+    }
+    .airmax-power.is-on .mark {
+      background: var(--teal);
+    }
+    .airmax-power.is-on .mark i {
+      left: 1.18rem;
+      background: white;
+    }
+    .airmax-power.is-on small {
+      color: var(--teal);
+    }
+    .airmax-power.is-loading .mark,
+    .airmax-power.is-releasing .mark {
+      background: var(--teal-deep);
+    }
+    .airmax-power.is-loading .mark i,
+    .airmax-power.is-releasing .mark i {
+      animation: airmax-pulse 1s ease-in-out infinite;
+    }
+    .airmax-power:disabled {
+      cursor: wait;
+    }
+    .engine-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.35rem;
+    }
+    .engine-switch {
+      display: flex;
+    }
+    .engine-switch button {
+      flex: 1;
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      padding: 0.28rem 0.45rem;
+      font-size: 0.72rem;
+      font-weight: 650;
+    }
+    .engine-switch button + button {
+      margin-left: -1px;
+    }
+    .engine-switch button.is-selected {
+      background: var(--teal);
+      color: var(--ink);
+      border-color: var(--teal);
+      position: relative;
+      z-index: 1;
+    }
+    .engine-switch button:disabled {
+      opacity: 0.45;
+      cursor: wait;
+    }
+    .engine-note {
+      color: #bdbdbd;
+      font-size: 0.68rem;
+      line-height: 1.2;
+    }
+    @keyframes airmax-pulse {
+      50% { opacity: 0.35; }
+    }
+    .switch {
+      position: relative;
+      width: 2.6rem;
+      height: 1.4rem;
+      background: #d0d0d0;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch i {
+      position: absolute;
+      top: 0.15rem;
+      left: 0.15rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      background: white;
+      border-radius: 999px;
+    }
+    .switch input:checked + i {
+      left: 1.35rem;
+      background: var(--ink);
+    }
+    .switch:has(input:checked) {
+      background: var(--teal);
+    }
+    .demo-chip {
+      border: 1px solid var(--ink);
+      background: white;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.8rem;
+    }
+    .demo-chip.selected {
+      background: var(--ink);
+      color: white;
+    }
+    .drawer-backdrop {
+      background: rgba(0, 0, 0, 0.35);
+    }
+    .drawer {
+      background: white;
+      width: min(440px, 100vw);
+      height: 100%;
+      overflow: auto;
+    }
+    .log-card {
+      border: 1px solid var(--line);
+      padding: 0.9rem;
+    }
+    .econ {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      color: var(--teal-deep);
+      font-weight: 650;
+      font-size: 0.8rem;
+    }
+    .answer {
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+    .answer .placeholder {
+      color: #737373;
+      margin: 0;
+    }
+    .answer h2,
+    .answer h3 {
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 1.15rem 0 0.45rem;
+      padding-bottom: 0.28rem;
+      border-bottom: 2px solid var(--teal);
+    }
+    .answer h2 { font-size: 1.2rem; }
+    .answer h3 { font-size: 1.02rem; }
+    .answer h2:first-child,
+    .answer h3:first-child { margin-top: 0; }
+    .answer p { margin: 0.55rem 0; }
+    .answer ul,
+    .answer ol {
+      margin: 0.35rem 0 0.8rem;
+      padding-left: 1.2rem;
+    }
+    .answer li { margin: 0.35rem 0; }
+    .answer li::marker { color: var(--teal-deep); }
+    .answer hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 1rem 0;
+    }
+    .answer table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.55rem 0 1rem;
+      font-size: 0.88rem;
+    }
+    .answer th {
+      background: var(--ink);
+      color: white;
+      text-align: left;
+      font-weight: 650;
+      padding: 0.5rem 0.65rem;
+    }
+    .answer td {
+      padding: 0.45rem 0.65rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .answer tbody tr:nth-child(even) td { background: #f3fbfb; }
+    .answer th.num,
+    .answer td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .answer code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.86em;
+      background: #f3f3f3;
+      padding: 0.05rem 0.28rem;
+    }
+    .answer pre {
+      background: var(--ink);
+      color: white;
+      padding: 0.85rem 1rem;
+      overflow: auto;
+      margin: 0.7rem 0 1rem;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    .answer pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    .answer pre[data-language]::before {
+      content: attr(data-language);
+      display: block;
+      color: var(--teal);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.45rem;
+    }
+    .answer .code-card pre {
+      background: transparent;
+      color: #e6edf3;
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.55;
+    }
+    .answer .code-card pre code,
+    .answer .code-card pre code.hljs {
+      background: transparent;
+      color: #e6edf3;
+      padding: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .answer .code-card pre[data-language]::before {
+      content: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="brand-header sticky top-0 z-50">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4">
+      <div class="mr-auto">
+        <p class="wordmark">Booz Allen</p>
+        <p class="product-line mt-1">Local AirMax</p>
+        <p class="code-caption mt-1">&lt;its_in_our_<span>code</span>&gt;</p>
+      </div>
+      <button id="openReceipt" type="button" class="px-2 py-1 text-left">
+        <p class="stat-label">Saved Today</p>
+        <p id="savedToday" class="stat-value">$0.00</p>
+      </button>
+      <div class="px-2 py-1">
+        <p class="stat-label">Projected Monthly Savings</p>
+        <p id="projectedMonth" class="stat-value">$0.00</p>
+      </div>
+      <div class="px-2 py-1">
+        <p class="stat-label">Tasks Run Locally</p>
+        <p id="tasksToday" class="stat-value">0</p>
+      </div>
+      <div class="engine-stack">
+        <button id="airmaxPower" type="button" class="airmax-power is-off" aria-pressed="false">
+          <span class="mark" aria-hidden="true"><i></i></span>
+          <span class="words">
+            <strong id="airmaxPowerLabel">AirMax Off</strong>
+            <small id="airmaxPowerHint">Turn on to download the model once.</small>
+          </span>
+        </button>
+        <div id="engineSwitch" class="engine-switch" role="radiogroup" aria-label="How AirMax should work">
+          <button type="button" data-engine="summaries" aria-pressed="true">Summaries</button>
+          <button type="button" data-engine="writing" aria-pressed="false">Writing</button>
+          <button type="button" data-engine="analysis" aria-pressed="false">Analysis</button>
+          <button type="button" data-engine="precision" aria-pressed="false">Precision</button>
+        </div>
+        <p id="engineNote" class="engine-note">Fastest • Best for quick briefs &amp; emails</p>
+      </div>
+      <p id="privacyPill" class="privacy-pill privacy-offline">100% Offline • 0 Bytes Sent to Cloud</p>
+      <button id="stopButton" type="button" class="header-button stop-button" disabled>Stop</button>
+      <button id="openLogs" type="button" class="header-button">Logs</button>
+    </div>
+  </header>
+
+  <div class="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[280px_1fr]">
+    <aside class="space-y-3">
+      <div class="border border-neutral-200 bg-white">
+        <label class="flex items-center justify-between px-4 py-3">
+          <span class="block text-sm font-semibold">Auto-Route (Smart Mode)</span>
+          <input id="autoRoute" type="checkbox" class="h-5 w-5" checked>
+        </label>
+        <button id="openChatButton" type="button" class="w-full border-t border-neutral-200 px-4 py-3 text-left">
+          <span class="block text-sm font-semibold">Chat</span>
+          <span class="block text-xs text-neutral-500">Pick the task from your sentence.</span>
+        </button>
+      </div>
+      <div id="taskList" class="space-y-2"></div>
+    </aside>
+
+    <main class="workspace p-5">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 class="text-xl font-semibold">Workspace</h1>
+          <p id="taskLabel" class="text-sm text-neutral-500">This will run as: Executive Document Brief</p>
+        </div>
+        <label class="flex items-center gap-3 text-sm font-semibold">
+          <span id="webSearchLabel">Web Search OFF</span>
+          <span class="switch">
+            <input id="webSearch" type="checkbox" role="switch" aria-checked="false">
+            <i></i>
+          </span>
+        </label>
+      </div>
+
+      <div id="dropZone" class="border border-dashed border-neutral-400 px-4 py-8 text-center">
+        <p class="font-medium">Drop a PDF, spreadsheet, or text file here</p>
+        <button id="browseFiles" type="button" class="black-button mt-3">Browse files</button>
+        <input id="fileInput" type="file" class="hidden" multiple accept=".pdf,.csv,.xlsx,.txt,.md">
+      </div>
+      <div id="demoChips" class="mt-3 flex flex-wrap gap-2"></div>
+      <ul id="fileList" class="mt-3 space-y-2"></ul>
+
+      <label class="mt-5 block text-sm font-semibold" for="prompt">What do you need?</label>
+      <textarea id="prompt" rows="5" class="mt-2 w-full border border-neutral-300 p-3" placeholder="Ask for a brief, a spreadsheet read, code, a memo, or research."></textarea>
+
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        <p id="estimateBadge" class="text-lg font-bold" style="color: var(--teal-deep);">Estimated Savings: ~$0.00</p>
+        <label class="text-sm">
+          Compare with
+          <select id="rateTier" class="ml-1 border border-neutral-300 px-2 py-1">
+            <option value="everyday">Everyday cloud prices</option>
+            <option value="premium">Premium cloud prices</option>
+          </select>
+        </label>
+        <button id="runButton" type="button" class="black-button ml-auto">Run</button>
+      </div>
+      <p id="warningLine" class="mt-2 text-sm text-amber-800"></p>
+      <p id="statusLine" class="mt-1 text-sm text-neutral-500"></p>
+
+      <div class="mt-5 border border-neutral-200 p-4">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="font-semibold">Result</h2>
+          <div class="flex items-center gap-2">
+            <button id="clearButton" type="button" class="line-button">Clear Result</button>
+            <button id="copyButton" type="button" class="black-button">Copy Result</button>
+          </div>
+        </div>
+        <div id="output" class="answer"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="chatModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-black/40 p-4">
+    <div class="flex max-h-[80vh] w-full max-w-2xl flex-col bg-white p-5">
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Chat</h2>
+        <button id="closeChat" type="button" class="black-button">Close</button>
+      </div>
+      <p class="text-sm text-neutral-500">Type a sentence. Smart Mode chooses the task, then the answer shows here.</p>
+      <div id="chatThread" class="mt-3 min-h-[220px] flex-1 space-y-3 overflow-auto border border-neutral-200 p-3"></div>
+      <p id="chatNote" class="mt-2 text-sm text-neutral-500"></p>
+      <label class="mt-3 block text-sm font-semibold" for="chatInput">Your sentence</label>
+      <textarea id="chatInput" rows="3" class="mt-2 w-full border border-neutral-300 p-3" placeholder="Ask for a brief, a spreadsheet read, code, a memo, or research."></textarea>
+      <div class="mt-3 flex justify-end">
+        <button id="sendChat" type="button" class="black-button">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="receiptModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-black/40 p-4">
+    <div class="max-h-[80vh] w-full max-w-4xl overflow-auto bg-white p-5">
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Savings receipt</h2>
+        <button id="closeReceipt" type="button" class="black-button">Close</button>
+      </div>
+      <div id="receiptBody" class="text-sm"></div>
+    </div>
+  </div>
+
+  <div id="logsBackdrop" class="drawer-backdrop fixed inset-0 z-40 hidden">
+    <div class="flex h-full justify-end">
+      <aside id="logsDrawer" class="drawer p-5 shadow-xl">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h2 class="text-lg font-semibold">Logs</h2>
+          <button id="closeLogs" type="button" class="black-button">Close</button>
+        </div>
+        <div class="mb-4 flex flex-wrap gap-2">
+          <a id="downloadAllJson" class="black-button inline-block" href="/logs/download?format=json">Download JSON</a>
+          <a id="downloadAllMd" class="black-button inline-block" href="/logs/download?format=md">Download Markdown</a>
+          <button id="deleteAllLogs" type="button" class="black-button">Delete all logs</button>
+        </div>
+        <div id="logsBody" class="space-y-3 text-sm"></div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    var tasks = [
+      { id: "brief", name: "Executive Document Brief", blurb: "Turn a long document into a short brief.", webDefault: false, engine: "precision" },
+      { id: "csv", name: "Spreadsheet & Data Analyst", blurb: "Explain a spreadsheet in plain English.", webDefault: false, engine: "precision" },
+      { id: "code", name: "Data Science & SQL Helper", blurb: "Draft Python or SQL.", webDefault: false, engine: "precision" },
+      { id: "memo", name: "Client & Internal Comms", blurb: "Write an email, memo, or proposal.", webDefault: false, engine: "writing" },
+      { id: "research", name: "Multi-Step Deep Research", blurb: "Answer a question from several files.", webDefault: true, engine: "analysis" }
+    ];
+
+    var engines = [
+      { id: "summaries", label: "Summaries", hint: "Fastest • Best for quick briefs & emails" },
+      { id: "writing", label: "Writing", hint: "Balanced • Best for memos & general drafting" },
+      { id: "analysis", label: "Analysis", hint: "Structured • Best for spreadsheets & data facts" },
+      { id: "precision", label: "Precision", hint: "Specialist • Uses your custom-trained templates" }
+    ];
+
+    var selectedTask = "brief";
+    var chosenFiles = [];
+    var chosenDemos = [];
+    var demoFiles = [];
+    var estimateTimer = null;
+    var estimateGeneration = 0;
+    var webTouched = false;
+
+    var taskList = document.getElementById("taskList");
+    var autoRoute = document.getElementById("autoRoute");
+    var openChatButton = document.getElementById("openChatButton");
+    var chatModal = document.getElementById("chatModal");
+    var closeChat = document.getElementById("closeChat");
+    var chatThread = document.getElementById("chatThread");
+    var chatNote = document.getElementById("chatNote");
+    var chatInput = document.getElementById("chatInput");
+    var sendChat = document.getElementById("sendChat");
+    var chatAnswer = null;
+    var chatShouldRun = false;
+    var dropZone = document.getElementById("dropZone");
+    var browseFiles = document.getElementById("browseFiles");
+    var fileInput = document.getElementById("fileInput");
+    var fileList = document.getElementById("fileList");
+    var demoChips = document.getElementById("demoChips");
+    var promptBox = document.getElementById("prompt");
+    var estimateBadge = document.getElementById("estimateBadge");
+    var taskLabel = document.getElementById("taskLabel");
+    var rateTier = document.getElementById("rateTier");
+    var warningLine = document.getElementById("warningLine");
+    var runButton = document.getElementById("runButton");
+    var stopButton = document.getElementById("stopButton");
+    var statusLine = document.getElementById("statusLine");
+    var currentRunId = "";
+    var output = document.getElementById("output");
+    var copyButton = document.getElementById("copyButton");
+    var clearButton = document.getElementById("clearButton");
+    var resultStamp = 0;
+    var savedToday = document.getElementById("savedToday");
+    var projectedMonth = document.getElementById("projectedMonth");
+    var tasksToday = document.getElementById("tasksToday");
+    var openReceipt = document.getElementById("openReceipt");
+    var receiptModal = document.getElementById("receiptModal");
+    var receiptBody = document.getElementById("receiptBody");
+    var closeReceipt = document.getElementById("closeReceipt");
+    var webSearch = document.getElementById("webSearch");
+    var airmaxPower = document.getElementById("airmaxPower");
+    var airmaxPowerLabel = document.getElementById("airmaxPowerLabel");
+    var airmaxPowerHint = document.getElementById("airmaxPowerHint");
+    var powerBusy = false;
+    var lastAnswer = "";
+    var selectedEngine = "precision";
+    var engineTouched = false;
+    var openLogs = document.getElementById("openLogs");
+    var closeLogs = document.getElementById("closeLogs");
+    var logsBackdrop = document.getElementById("logsBackdrop");
+    var logsBody = document.getElementById("logsBody");
+    var deleteAllLogs = document.getElementById("deleteAllLogs");
+
+    function money(value) {
+      var number = Number(value);
+      if (Number.isNaN(number)) {
+        number = 0;
+      }
+      return "$" + number.toFixed(2);
+    }
+
+    function moneyFine(value) {
+      var number = Number(value);
+      if (Number.isNaN(number)) {
+        number = 0;
+      }
+      return "$" + number.toFixed(4);
+    }
+
+    function webDefaultFor(taskId) {
+      var index = 0;
+      while (index < tasks.length) {
+        if (tasks[index].id === taskId) {
+          return tasks[index].webDefault;
+        }
+        index = index + 1;
+      }
+      return false;
+    }
+
+    function paintWebSearch() {
+      var pill = document.getElementById("privacyPill");
+      var label = document.getElementById("webSearchLabel");
+      if (webSearch.checked) {
+        label.textContent = "Web Search ON";
+        webSearch.setAttribute("aria-checked", "true");
+        pill.textContent = "Local AI • Web Search Active (Query Only)";
+        pill.className = "privacy-pill privacy-search";
+      } else {
+        label.textContent = "Web Search OFF";
+        webSearch.setAttribute("aria-checked", "false");
+        pill.textContent = "100% Offline • 0 Bytes Sent to Cloud";
+        pill.className = "privacy-pill privacy-offline";
+      }
+    }
+
+    function taskName(taskId) {
+      var index = 0;
+      while (index < tasks.length) {
+        if (tasks[index].id === taskId) {
+          return tasks[index].name;
+        }
+        index = index + 1;
+      }
+      return "Executive Document Brief";
+    }
+
+    function engineForTask(taskId) {
+      var index = 0;
+      while (index < tasks.length) {
+        if (tasks[index].id === taskId) {
+          return tasks[index].engine;
+        }
+        index = index + 1;
+      }
+      return "summaries";
+    }
+
+    function engineRecord(engine) {
+      var index = 0;
+      while (index < engines.length) {
+        if (engines[index].id === engine) {
+          return engines[index];
+        }
+        index = index + 1;
+      }
+      return engines[0];
+    }
+
+    function engineTitle(engine) {
+      return engineRecord(engine).label;
+    }
+
+    function engineNoteText(engine) {
+      return engineRecord(engine).hint;
+    }
+
+    function engineStayHint(engine) {
+      return engineRecord(engine).label + " stays in memory until you turn AirMax off.";
+    }
+
+    function paintEngine() {
+      var buttons = document.querySelectorAll("#engineSwitch button");
+      var index = 0;
+      while (index < buttons.length) {
+        var button = buttons[index];
+        var engine = button.getAttribute("data-engine");
+        if (engine === selectedEngine) {
+          button.className = "is-selected";
+          button.setAttribute("aria-pressed", "true");
+        } else {
+          button.className = "";
+          button.setAttribute("aria-pressed", "false");
+        }
+        button.disabled = powerBusy;
+        index = index + 1;
+      }
+      var note = document.getElementById("engineNote");
+      note.textContent = engineNoteText(selectedEngine);
+    }
+
+    function showPlannedTask(name) {
+      taskLabel.textContent = "This will run as: " + name + " · " + engineTitle(selectedEngine);
+    }
+
+    function applyWebDefault(taskId) {
+      if (webTouched) {
+        return;
+      }
+      webSearch.checked = webDefaultFor(taskId);
+      paintWebSearch();
+    }
+
+    function paintTasks() {
+      taskList.innerHTML = "";
+      var index = 0;
+      while (index < tasks.length) {
+        var task = tasks[index];
+        var button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("data-task", task.id);
+        button.className = "task-card";
+        if (task.id === selectedTask && autoRoute.checked === false) {
+          button.className = button.className + " selected";
+        }
+        var title = document.createElement("span");
+        title.className = "block text-sm font-semibold";
+        title.textContent = task.name;
+        var blurb = document.createElement("span");
+        blurb.className = "block text-xs text-neutral-500";
+        blurb.textContent = task.blurb;
+        button.appendChild(title);
+        button.appendChild(blurb);
+        button.addEventListener("click", function (event) {
+          var target = event.currentTarget;
+          var previousEngine = selectedEngine;
+          var nextTask = target.getAttribute("data-task");
+          var taskChanged = nextTask !== selectedTask;
+          selectedTask = nextTask;
+          autoRoute.checked = false;
+          webTouched = false;
+          engineTouched = false;
+          selectedEngine = engineForTask(selectedTask);
+          paintEngine();
+          applyWebDefault(selectedTask);
+          showPlannedTask(taskName(selectedTask));
+          paintTasks();
+          scheduleEstimate();
+          if (taskChanged) {
+            clearResult();
+          }
+          var loadSpecialist = false;
+          if (taskChanged && selectedEngine === "precision") {
+            loadSpecialist = true;
+          }
+          if (previousEngine !== selectedEngine) {
+            loadSpecialist = true;
+          }
+          if (loadSpecialist && airmaxPower.getAttribute("aria-pressed") === "true") {
+            setPower(true);
+          }
+        });
+        taskList.appendChild(button);
+        index = index + 1;
+      }
+    }
+
+    function allowedFile(file) {
+      var name = file.name.toLowerCase();
+      if (name.endsWith(".pdf") || name.endsWith(".csv") || name.endsWith(".xlsx")) {
+        return true;
+      }
+      if (name.endsWith(".txt") || name.endsWith(".md")) {
+        return true;
+      }
+      return false;
+    }
+
+    function addFiles(fileListLike) {
+      var index = 0;
+      while (index < fileListLike.length) {
+        var file = fileListLike[index];
+        if (allowedFile(file)) {
+          var kept = new File([file], file.name, { type: file.type, lastModified: file.lastModified });
+          chosenFiles.push(kept);
+        }
+        index = index + 1;
+      }
+      paintFiles();
+      scheduleEstimate();
+    }
+
+    function paintFiles() {
+      fileList.innerHTML = "";
+      var index = 0;
+      while (index < chosenFiles.length) {
+        var file = chosenFiles[index];
+        var item = document.createElement("li");
+        item.className = "flex items-center justify-between border border-neutral-200 px-3 py-2 text-sm";
+        var name = document.createElement("span");
+        name.textContent = file.name;
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "Remove";
+        remove.className = "text-neutral-500";
+        remove.setAttribute("data-index", String(index));
+        remove.addEventListener("click", function (event) {
+          var at = Number(event.currentTarget.getAttribute("data-index"));
+          var next = [];
+          var cursor = 0;
+          while (cursor < chosenFiles.length) {
+            if (cursor !== at) {
+              next.push(chosenFiles[cursor]);
+            }
+            cursor = cursor + 1;
+          }
+          chosenFiles = next;
+          paintFiles();
+          scheduleEstimate();
+        });
+        item.appendChild(name);
+        item.appendChild(remove);
+        fileList.appendChild(item);
+        index = index + 1;
+      }
+    }
+
+    function paintDemos() {
+      demoChips.innerHTML = "";
+      var index = 0;
+      while (index < demoFiles.length) {
+        var demo = demoFiles[index];
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "demo-chip";
+        chip.textContent = demo.title;
+        chip.setAttribute("data-name", demo.name);
+        var selected = false;
+        var cursor = 0;
+        while (cursor < chosenDemos.length) {
+          if (chosenDemos[cursor] === demo.name) {
+            selected = true;
+          }
+          cursor = cursor + 1;
+        }
+        if (selected) {
+          chip.className = "demo-chip selected";
+        }
+        chip.addEventListener("click", function (event) {
+          var name = event.currentTarget.getAttribute("data-name");
+          var next = [];
+          var found = false;
+          var at = 0;
+          while (at < chosenDemos.length) {
+            if (chosenDemos[at] === name) {
+              found = true;
+            } else {
+              next.push(chosenDemos[at]);
+            }
+            at = at + 1;
+          }
+          if (found === false) {
+            next.push(name);
+          }
+          chosenDemos = next;
+          paintDemos();
+          scheduleEstimate();
+        });
+        demoChips.appendChild(chip);
+        index = index + 1;
+      }
+    }
+
+    function loadDemos() {
+      fetch("/demo-files")
+        .then(function (response) { return response.json(); })
+        .then(function (rows) {
+          demoFiles = rows;
+          paintDemos();
+        });
+    }
+
+    function formData() {
+      var body = new FormData();
+      body.append("prompt", promptBox.value);
+      if (autoRoute.checked) {
+        body.append("auto_route", "true");
+      } else {
+        body.append("auto_route", "false");
+      }
+      body.append("task_id", selectedTask);
+      body.append("client_run_id", currentRunId);
+      body.append("model_choice", selectedEngine);
+      body.append("rate_tier", rateTier.value);
+      if (webSearch.checked) {
+        body.append("use_web_search", "true");
+      } else {
+        body.append("use_web_search", "false");
+      }
+      var index = 0;
+      while (index < chosenFiles.length) {
+        var attached = chosenFiles[index];
+        body.append("files", attached, attached.name);
+        index = index + 1;
+      }
+      var demoIndex = 0;
+      while (demoIndex < chosenDemos.length) {
+        body.append("demo_files", chosenDemos[demoIndex]);
+        demoIndex = demoIndex + 1;
+      }
+      return body;
+    }
+
+    function scheduleEstimate() {
+      if (estimateTimer !== null) {
+        clearTimeout(estimateTimer);
+      }
+      estimateGeneration = estimateGeneration + 1;
+      var generation = estimateGeneration;
+      estimateTimer = setTimeout(function () {
+        runEstimate(generation);
+      }, 400);
+    }
+
+    function runEstimate(generation) {
+      fetch("/api/estimate", { method: "POST", body: formData() })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          if (generation !== estimateGeneration) {
+            return;
+          }
+          if (data.error) {
+            warningLine.textContent = data.error;
+            if (chatShouldRun) {
+              chatShouldRun = false;
+              chatNote.textContent = data.error;
+            }
+            return;
+          }
+          estimateBadge.textContent = "Estimated Savings: ~" + money(data.estimated_savings);
+          if (autoRoute.checked) {
+            if (engineTouched === false && data.task_id) {
+              selectedEngine = engineForTask(data.task_id);
+              paintEngine();
+            }
+            showPlannedTask(data.task_name);
+            applyWebDefault(data.task_id);
+            chatNote.textContent = taskLabel.textContent;
+          } else {
+            showPlannedTask(taskName(selectedTask));
+          }
+          if (data.warning) {
+            warningLine.textContent = data.warning;
+          } else {
+            warningLine.textContent = "";
+          }
+          if (chatShouldRun) {
+            chatShouldRun = false;
+            if (runButton.disabled === false) {
+              runButton.click();
+            }
+          }
+        })
+        .catch(function () {
+          if (generation !== estimateGeneration) {
+            return;
+          }
+          warningLine.textContent = "The savings estimate could not be calculated.";
+          if (chatShouldRun) {
+            chatShouldRun = false;
+            chatNote.textContent = "The sentence could not be read.";
+          }
+        });
+    }
+
+    function paintPower(state) {
+      airmaxPower.className = "airmax-power";
+      airmaxPower.disabled = false;
+      if (state === "loading") {
+        airmaxPower.className = "airmax-power is-loading";
+        airmaxPowerLabel.textContent = "AirMax Loading";
+        airmaxPowerHint.textContent = "Downloading once. It then stays in memory.";
+        airmaxPower.disabled = true;
+        airmaxPower.setAttribute("aria-pressed", "false");
+      } else if (state === "releasing") {
+        airmaxPower.className = "airmax-power is-releasing";
+        airmaxPowerLabel.textContent = "AirMax Off";
+        airmaxPowerHint.textContent = "Releasing the model from memory.";
+        airmaxPower.disabled = true;
+        airmaxPower.setAttribute("aria-pressed", "false");
+      } else if (state === "on") {
+        airmaxPower.className = "airmax-power is-on";
+        airmaxPowerLabel.textContent = "AirMax On";
+        airmaxPowerHint.textContent = engineStayHint(selectedEngine);
+        airmaxPower.setAttribute("aria-pressed", "true");
+      } else {
+        airmaxPower.className = "airmax-power is-off";
+        airmaxPowerLabel.textContent = "AirMax Off";
+        airmaxPowerHint.textContent = "Turn on to download the model once.";
+        airmaxPower.setAttribute("aria-pressed", "false");
+      }
+      paintEngine();
+    }
+
+    function loadPower() {
+      fetch("/api/model-power")
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          if (powerBusy) {
+            return;
+          }
+          if (data.power === "on" && data.model_choice) {
+            selectedEngine = data.model_choice;
+            paintEngine();
+            showPlannedTask(taskName(selectedTask));
+          }
+          if (data.power === "on") {
+            paintPower("on");
+          } else {
+            paintPower("off");
+          }
+        });
+    }
+
+    function setPower(turnOn) {
+      if (powerBusy) {
+        return;
+      }
+      powerBusy = true;
+      if (turnOn) {
+        paintPower("loading");
+      } else {
+        paintPower("releasing");
+      }
+      var payload = {};
+      if (turnOn) {
+        payload.power = "on";
+      } else {
+        payload.power = "off";
+      }
+      payload.model_choice = selectedEngine;
+      payload.task_id = selectedTask;
+      fetch("/api/model-power", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          powerBusy = false;
+          if (data.error) {
+            warningLine.textContent = data.error;
+            paintPower("off");
+            return;
+          }
+          warningLine.textContent = "";
+          paintPower(data.power);
+        })
+        .catch(function () {
+          powerBusy = false;
+          warningLine.textContent = "The local model could not be changed.";
+          paintPower("off");
+        });
+    }
+
+    function loadSummary() {
+      fetch("/api/summary")
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          savedToday.textContent = money(data.saved_today);
+          projectedMonth.textContent = money(data.projected_month);
+          tasksToday.textContent = String(data.tasks_today);
+        });
+    }
+
+    function openReceiptPanel() {
+      receiptModal.classList.remove("hidden");
+      receiptModal.classList.add("flex");
+      fetch("/api/receipt")
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          if (!data.rows || data.rows.length === 0) {
+            receiptBody.textContent = "No tasks yet.";
+            return;
+          }
+          var table = document.createElement("table");
+          table.className = "w-full text-left";
+          var head = document.createElement("tr");
+          var titles = ["When", "Task", "Tokens in", "Tokens out", "Cloud cost", "Local cost", "Saved"];
+          var titleIndex = 0;
+          while (titleIndex < titles.length) {
+            var cell = document.createElement("th");
+            cell.className = "border-b border-neutral-200 py-2 pr-3 text-xs uppercase text-neutral-500";
+            cell.textContent = titles[titleIndex];
+            head.appendChild(cell);
+            titleIndex = titleIndex + 1;
+          }
+          table.appendChild(head);
+          var rowIndex = 0;
+          while (rowIndex < data.rows.length) {
+            var item = data.rows[rowIndex];
+            var row = document.createElement("tr");
+            var values = [
+              item.created_at,
+              item.task_name,
+              String(item.input_tokens),
+              String(item.output_tokens),
+              money(item.cloud_cost),
+              money(item.local_cost),
+              money(item.savings)
+            ];
+            var valueIndex = 0;
+            while (valueIndex < values.length) {
+              var column = document.createElement("td");
+              column.className = "border-b border-neutral-100 py-2 pr-3";
+              column.textContent = values[valueIndex];
+              row.appendChild(column);
+              valueIndex = valueIndex + 1;
+            }
+            table.appendChild(row);
+            rowIndex = rowIndex + 1;
+          }
+          receiptBody.innerHTML = "";
+          receiptBody.appendChild(table);
+        });
+    }
+
+    function closeReceiptPanel() {
+      receiptModal.classList.add("hidden");
+      receiptModal.classList.remove("flex");
+    }
+
+    function webSearchWords(enabled) {
+      if (enabled) {
+        return "on";
+      }
+      return "off";
+    }
+
+    function paintLogs(rows) {
+      logsBody.innerHTML = "";
+      if (!rows || rows.length === 0) {
+        logsBody.textContent = "No runs yet.";
+        return;
+      }
+      var index = 0;
+      while (index < rows.length) {
+        var record = rows[index];
+        var card = document.createElement("article");
+        card.className = "log-card";
+        var heading = document.createElement("p");
+        heading.className = "font-semibold";
+        heading.textContent = record.timestamp + " — " + record.task_title;
+        card.appendChild(heading);
+        var meta = document.createElement("p");
+        meta.className = "mt-1 text-neutral-600";
+        meta.textContent = record.base_model + " · " + record.adapter_used + " · web search " + webSearchWords(record.web_search_enabled);
+        card.appendChild(meta);
+        var econ = document.createElement("p");
+        econ.className = "econ mt-2";
+        econ.textContent = "Prefill " + record.prefill_tokens
+          + " · Output " + record.output_tokens
+          + " · Cloud " + moneyFine(record.estimated_cloud_cost)
+          + " · Local " + moneyFine(record.local_cost)
+          + " · Saved " + moneyFine(record.net_savings);
+        card.appendChild(econ);
+        var timeline = document.createElement("ol");
+        timeline.className = "mt-3 list-decimal space-y-1 pl-5";
+        var events = record.events || [];
+        var eventIndex = 0;
+        while (eventIndex < events.length) {
+          var event = events[eventIndex];
+          var line = document.createElement("li");
+          line.textContent = event.stage + " — " + event.detail;
+          timeline.appendChild(line);
+          eventIndex = eventIndex + 1;
+        }
+        card.appendChild(timeline);
+        var actions = document.createElement("div");
+        actions.className = "mt-3 flex flex-wrap gap-2";
+        var jsonLink = document.createElement("a");
+        jsonLink.className = "black-button inline-block";
+        jsonLink.textContent = "Download JSON";
+        jsonLink.href = "/logs/download?run_id=" + encodeURIComponent(record.run_id) + "&format=json";
+        var mdLink = document.createElement("a");
+        mdLink.className = "black-button inline-block";
+        mdLink.textContent = "Download Markdown";
+        mdLink.href = "/logs/download?run_id=" + encodeURIComponent(record.run_id) + "&format=md";
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "black-button";
+        remove.textContent = "Delete this run";
+        remove.setAttribute("data-run", record.run_id);
+        remove.addEventListener("click", function (event) {
+          var runId = event.currentTarget.getAttribute("data-run");
+          var sure = window.confirm("Delete this run log?");
+          if (sure === false) {
+            return;
+          }
+          fetch("/logs/" + encodeURIComponent(runId), { method: "DELETE" })
+            .then(function () { loadLogs(); });
+        });
+        actions.appendChild(jsonLink);
+        actions.appendChild(mdLink);
+        actions.appendChild(remove);
+        card.appendChild(actions);
+        logsBody.appendChild(card);
+        index = index + 1;
+      }
+    }
+
+    function loadLogs() {
+      fetch("/logs")
+        .then(function (response) { return response.json(); })
+        .then(function (rows) {
+          paintLogs(rows);
+        });
+    }
+
+    function openLogsPanel() {
+      logsBackdrop.classList.remove("hidden");
+      loadLogs();
+    }
+
+    function closeLogsPanel() {
+      logsBackdrop.classList.add("hidden");
+    }
+
+    function addInline(parent, text) {
+      var index = 0;
+      var buffer = "";
+      function flush() {
+        if (buffer !== "") {
+          parent.appendChild(document.createTextNode(buffer));
+          buffer = "";
+        }
+      }
+      while (index < text.length) {
+        if (text.substr(index, 2) === "**") {
+          var boldEnd = text.indexOf("**", index + 2);
+          if (boldEnd === -1) {
+            buffer = buffer + "*";
+            index = index + 1;
+          } else {
+            flush();
+            var strong = document.createElement("strong");
+            strong.textContent = text.substring(index + 2, boldEnd);
+            parent.appendChild(strong);
+            index = boldEnd + 2;
+          }
+        } else if (text.charAt(index) === "`") {
+          var codeEnd = text.indexOf("`", index + 1);
+          if (codeEnd === -1) {
+            buffer = buffer + "`";
+            index = index + 1;
+          } else {
+            flush();
+            var code = document.createElement("code");
+            code.textContent = text.substring(index + 1, codeEnd);
+            parent.appendChild(code);
+            index = codeEnd + 1;
+          }
+        } else if (text.charAt(index) === "*") {
+          var italicEnd = text.indexOf("*", index + 1);
+          if (italicEnd === -1) {
+            buffer = buffer + "*";
+            index = index + 1;
+          } else {
+            flush();
+            var em = document.createElement("em");
+            em.textContent = text.substring(index + 1, italicEnd);
+            parent.appendChild(em);
+            index = italicEnd + 1;
+          }
+        } else {
+          buffer = buffer + text.charAt(index);
+          index = index + 1;
+        }
+      }
+      flush();
+    }
+
+    function headingLevel(line) {
+      var trimmed = line.trim();
+      var level = 0;
+      while (level < trimmed.length && trimmed.charAt(level) === "#") {
+        level = level + 1;
+      }
+      if (level < 1 || level > 3) {
+        return 0;
+      }
+      if (trimmed.charAt(level) !== " ") {
+        return 0;
+      }
+      return level;
+    }
+
+    function isRule(line) {
+      var trimmed = line.trim();
+      if (trimmed.length < 3) {
+        return false;
+      }
+      var mark = trimmed.charAt(0);
+      if (mark !== "-" && mark !== "*" && mark !== "_") {
+        return false;
+      }
+      var index = 0;
+      while (index < trimmed.length) {
+        if (trimmed.charAt(index) !== mark) {
+          return false;
+        }
+        index = index + 1;
+      }
+      return true;
+    }
+
+    function isFence(line) {
+      return line.trim().indexOf("```") === 0;
+    }
+
+    function isBullet(line) {
+      var trimmed = line.trim();
+      if (trimmed.indexOf("* ") === 0 || trimmed.indexOf("- ") === 0) {
+        return true;
+      }
+      return false;
+    }
+
+    function isNumbered(line) {
+      var trimmed = line.trim();
+      var index = 0;
+      var sawDigit = false;
+      while (index < trimmed.length) {
+        var character = trimmed.charAt(index);
+        if (character >= "0" && character <= "9") {
+          sawDigit = true;
+          index = index + 1;
+        } else {
+          break;
+        }
+      }
+      if (sawDigit === false) {
+        return false;
+      }
+      if (trimmed.charAt(index) === "." && trimmed.charAt(index + 1) === " ") {
+        return true;
+      }
+      return false;
+    }
+
+    function listItemText(line) {
+      var trimmed = line.trim();
+      if (isBullet(trimmed)) {
+        return trimmed.substring(trimmed.indexOf(" ") + 1).trim();
+      }
+      var index = 0;
+      while (index < trimmed.length && trimmed.charAt(index) >= "0" && trimmed.charAt(index) <= "9") {
+        index = index + 1;
+      }
+      return trimmed.substring(index + 2).trim();
+    }
+
+    function isTableLine(line) {
+      return line.trim().charAt(0) === "|";
+    }
+
+    function isDividerLine(line) {
+      var trimmed = line.trim();
+      var index = 0;
+      var sawDash = false;
+      if (trimmed === "") {
+        return false;
+      }
+      while (index < trimmed.length) {
+        var character = trimmed.charAt(index);
+        if (character === "-" || character === ":") {
+          sawDash = true;
+        }
+        if (character !== "|" && character !== "-" && character !== ":" && character !== " " && character !== "\t") {
+          return false;
+        }
+        index = index + 1;
+      }
+      return sawDash;
+    }
+
+    function tableCells(line) {
+      var trimmed = line.trim();
+      if (trimmed.charAt(0) === "|") {
+        trimmed = trimmed.substring(1);
+      }
+      if (trimmed.charAt(trimmed.length - 1) === "|") {
+        trimmed = trimmed.substring(0, trimmed.length - 1);
+      }
+      var parts = trimmed.split("|");
+      var cells = [];
+      var index = 0;
+      while (index < parts.length) {
+        cells.push(parts[index].trim());
+        index = index + 1;
+      }
+      return cells;
+    }
+
+    function plainCell(text) {
+      var cleaned = text.split("*").join("");
+      cleaned = cleaned.split("`").join("");
+      return cleaned.trim();
+    }
+
+    function looksNumeric(text) {
+      var cleaned = plainCell(text).split(",").join("").split("%").join("").split("+").join("");
+      if (cleaned === "") {
+        return false;
+      }
+      var number = Number(cleaned);
+      if (Number.isNaN(number)) {
+        return false;
+      }
+      return true;
+    }
+
+    function columnIsNumeric(matrix, column) {
+      var hits = 0;
+      var seen = 0;
+      var row = 1;
+      while (row < matrix.length) {
+        if (column < matrix[row].length) {
+          var value = matrix[row][column].trim();
+          if (value !== "") {
+            seen = seen + 1;
+            if (looksNumeric(value)) {
+              hits = hits + 1;
+            }
+          }
+        }
+        row = row + 1;
+      }
+      if (seen === 0) {
+        return false;
+      }
+      if (hits * 2 >= seen) {
+        return true;
+      }
+      return false;
+    }
+
+    function paintTable(parent, matrix) {
+      var table = document.createElement("table");
+      var head = document.createElement("thead");
+      var headRow = document.createElement("tr");
+      var column = 0;
+      var numeric = [];
+      while (column < matrix[0].length) {
+        var header = document.createElement("th");
+        addInline(header, matrix[0][column]);
+        var numbers = columnIsNumeric(matrix, column);
+        numeric.push(numbers);
+        if (numbers) {
+          header.className = "num";
+        }
+        headRow.appendChild(header);
+        column = column + 1;
+      }
+      head.appendChild(headRow);
+      table.appendChild(head);
+      var body = document.createElement("tbody");
+      var open = [];
+      column = 0;
+      while (column < matrix[0].length) {
+        open.push(null);
+        column = column + 1;
+      }
+      var row = 1;
+      while (row < matrix.length) {
+        var line = document.createElement("tr");
+        column = 0;
+        while (column < matrix[row].length) {
+          var raw = matrix[row][column];
+          var value = "";
+          if (raw !== null && raw !== undefined) {
+            value = String(raw).trim();
+          }
+          if (value === "" && open[column] !== null && open[column] !== undefined) {
+            open[column].rowSpan = open[column].rowSpan + 1;
+          } else {
+            var cell = document.createElement("td");
+            addInline(cell, value);
+            if (numeric[column]) {
+              cell.className = "num";
+            }
+            line.appendChild(cell);
+            while (open.length <= column) {
+              open.push(null);
+            }
+            open[column] = cell;
+          }
+          column = column + 1;
+        }
+        body.appendChild(line);
+        row = row + 1;
+      }
+      table.appendChild(body);
+      parent.appendChild(table);
+    }
+
+    function renderAnswer(parent, text) {
+      var normalized = text.split("\r\n").join("\n").split("\r").join("\n");
+      var lines = normalized.split("\n");
+      var index = 0;
+      while (index < lines.length) {
+        var trimmed = lines[index].trim();
+        if (trimmed === "") {
+          index = index + 1;
+          continue;
+        }
+        if (isFence(trimmed)) {
+          var language = trimmed.substring(3).trim();
+          var codeText = "";
+          index = index + 1;
+          while (index < lines.length && isFence(lines[index].trim()) === false) {
+            if (codeText === "") {
+              codeText = lines[index];
+            } else {
+              codeText = codeText + "\n" + lines[index];
+            }
+            index = index + 1;
+          }
+          if (index < lines.length) {
+            index = index + 1;
+          }
+          var block = document.createElement("pre");
+          if (language !== "") {
+            block.setAttribute("data-language", language);
+          }
+          var code = document.createElement("code");
+          code.textContent = codeText;
+          block.appendChild(code);
+          parent.appendChild(block);
+          continue;
+        }
+        if (isTableLine(trimmed) && index + 1 < lines.length && isDividerLine(lines[index + 1])) {
+          var matrix = [];
+          matrix.push(tableCells(trimmed));
+          index = index + 2;
+          while (index < lines.length && isTableLine(lines[index].trim())) {
+            matrix.push(tableCells(lines[index]));
+            index = index + 1;
+          }
+          paintTable(parent, matrix);
+          continue;
+        }
+        var level = headingLevel(trimmed);
+        if (level > 0) {
+          var tag = "h3";
+          if (level < 3) {
+            tag = "h2";
+          }
+          var heading = document.createElement(tag);
+          addInline(heading, trimmed.substring(level + 1).trim());
+          parent.appendChild(heading);
+          index = index + 1;
+          continue;
+        }
+        if (isRule(trimmed)) {
+          parent.appendChild(document.createElement("hr"));
+          index = index + 1;
+          continue;
+        }
+        if (isBullet(trimmed) || isNumbered(trimmed)) {
+          var listTag = "ul";
+          var listTest = isBullet;
+          if (isNumbered(trimmed)) {
+            listTag = "ol";
+            listTest = isNumbered;
+          }
+          var list = document.createElement(listTag);
+          while (index < lines.length) {
+            var item = lines[index].trim();
+            if (item === "") {
+              if (index + 1 < lines.length && listTest(lines[index + 1].trim())) {
+                index = index + 1;
+                continue;
+              }
+              break;
+            }
+            if (listTest(item) === false) {
+              break;
+            }
+            var li = document.createElement("li");
+            addInline(li, listItemText(item));
+            list.appendChild(li);
+            index = index + 1;
+          }
+          parent.appendChild(list);
+          continue;
+        }
+        var paragraph = document.createElement("p");
+        var sentence = trimmed;
+        index = index + 1;
+        while (index < lines.length) {
+          var next = lines[index].trim();
+          if (next === "") {
+            break;
+          }
+          if (isFence(next) || isTableLine(next) || headingLevel(next) > 0 || isRule(next) || isBullet(next) || isNumbered(next)) {
+            break;
+          }
+          sentence = sentence + " " + next;
+          index = index + 1;
+        }
+        addInline(paragraph, sentence);
+        parent.appendChild(paragraph);
+      }
+    }
+
+    var markdownReady = false;
+
+    function prepareMarkdown() {
+      if (markdownReady) {
+        return;
+      }
+      if (window.marked && window.marked.setOptions) {
+        window.marked.setOptions({
+          gfm: true,
+          breaks: false,
+          headerIds: false,
+          mangle: false
+        });
+        markdownReady = true;
+      }
+    }
+
+    function openFenceCount(text) {
+      var count = 0;
+      var index = 0;
+      while (index < text.length) {
+        var at = text.indexOf("```", index);
+        if (at === -1) {
+          break;
+        }
+        count = count + 1;
+        index = at + 3;
+      }
+      return count;
+    }
+
+    function markdownForRender(text) {
+      var count = openFenceCount(text);
+      var remainder = count - Math.floor(count / 2) * 2;
+      if (remainder === 1) {
+        return text + "\n```";
+      }
+      return text;
+    }
+
+    function languageLabel(code, pre) {
+      var label = "";
+      var fromPre = pre.getAttribute("data-language");
+      if (fromPre) {
+        label = fromPre;
+      }
+      if (label === "") {
+        var className = code.className;
+        var marker = "language-";
+        var at = className.indexOf(marker);
+        if (at !== -1) {
+          var rest = className.substring(at + marker.length);
+          var end = rest.indexOf(" ");
+          if (end === -1) {
+            label = rest;
+          } else {
+            label = rest.substring(0, end);
+          }
+        }
+      }
+      label = label.trim().toLowerCase();
+      if (label === "" || label === "plaintext" || label === "text") {
+        return "CODE";
+      }
+      return label.toUpperCase();
+    }
+
+    function copyCodeText(text, button) {
+      function markCopied() {
+        button.textContent = "Copied!";
+        setTimeout(function () {
+          button.textContent = "Copy Code";
+        }, 1200);
+      }
+      function fallback() {
+        var area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        var worked = false;
+        try {
+          worked = document.execCommand("copy");
+        } catch (err) {
+          worked = false;
+        }
+        document.body.removeChild(area);
+        if (worked) {
+          markCopied();
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(markCopied).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    function dressCodeCards(root) {
+      var blocks = root.querySelectorAll("pre");
+      var index = 0;
+      while (index < blocks.length) {
+        var pre = blocks[index];
+        index = index + 1;
+        if (pre.closest(".code-card")) {
+          continue;
+        }
+        var code = pre.querySelector("code");
+        if (code === null) {
+          continue;
+        }
+        var label = "CODE";
+        try {
+          label = languageLabel(code, pre);
+        } catch (err) {
+          label = "CODE";
+        }
+        var className = "";
+        if (code.className !== null && code.className !== undefined) {
+          className = String(code.className);
+        }
+        if (window.hljs && className.indexOf("hljs") === -1) {
+          try {
+            window.hljs.highlightElement(code);
+          } catch (err) {
+            className = className;
+          }
+        }
+        var card = document.createElement("div");
+        card.className = "code-card rounded-xl overflow-hidden border border-slate-700 bg-[#0d1117] my-4 shadow-sm";
+        var bar = document.createElement("div");
+        bar.className = "bg-slate-800/90 px-4 py-2 flex justify-between items-center";
+        var name = document.createElement("span");
+        name.className = "font-mono text-xs tracking-wide text-slate-300";
+        name.textContent = label;
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "text-xs font-semibold text-slate-100";
+        button.textContent = "Copy Code";
+        button.addEventListener("click", function (event) {
+          var control = event.currentTarget;
+          var holder = control.parentNode.parentNode;
+          var source = holder.querySelector("code");
+          copyCodeText(source.textContent, control);
+        });
+        bar.appendChild(name);
+        bar.appendChild(button);
+        pre.className = "m-0 p-4 overflow-x-auto";
+        pre.parentNode.insertBefore(card, pre);
+        card.appendChild(bar);
+        card.appendChild(pre);
+      }
+    }
+
+    function paintResult(text) {
+      output.innerHTML = "";
+      if (text === null || text === undefined || String(text).trim() === "") {
+        var note = document.createElement("p");
+        note.className = "placeholder";
+        note.textContent = "Your result will show up here.";
+        output.appendChild(note);
+        return;
+      }
+      var source = markdownForRender(String(text));
+      try {
+        var usedMarked = false;
+        if (window.marked && window.marked.parse) {
+          try {
+            prepareMarkdown();
+            output.innerHTML = window.marked.parse(source);
+            usedMarked = true;
+          } catch (err) {
+            usedMarked = false;
+          }
+        }
+        if (usedMarked === false) {
+          output.innerHTML = "";
+          renderAnswer(output, source);
+        }
+        dressCodeCards(output);
+      } catch (err) {
+        output.textContent = String(text);
+      }
+    }
+
+    function setRunIdle() {
+      runButton.disabled = false;
+      stopButton.disabled = true;
+    }
+
+    function openChatPanel() {
+      chatModal.classList.remove("hidden");
+      chatModal.classList.add("flex");
+      chatInput.focus();
+    }
+
+    function closeChatPanel() {
+      chatModal.classList.add("hidden");
+      chatModal.classList.remove("flex");
+    }
+
+    function addChatLine(who, text) {
+      var row = document.createElement("p");
+      row.className = "text-sm";
+      var label = document.createElement("span");
+      label.className = "font-semibold";
+      label.textContent = who;
+      row.appendChild(label);
+      row.appendChild(document.createTextNode(" " + text));
+      chatThread.appendChild(row);
+      chatThread.scrollTop = chatThread.scrollHeight;
+    }
+
+    function showChatAnswer(text) {
+      if (text === null || text === undefined || text === "") {
+        if (chatAnswer !== null) {
+          chatAnswer.textContent = "";
+        }
+        return;
+      }
+      if (chatAnswer === null) {
+        chatAnswer = document.createElement("div");
+        chatAnswer.className = "whitespace-pre-wrap text-sm";
+        chatThread.appendChild(chatAnswer);
+      }
+      chatAnswer.textContent = text;
+      chatThread.scrollTop = chatThread.scrollHeight;
+    }
+
+    function sendChatSentence() {
+      var sentence = chatInput.value.trim();
+      if (sentence === "") {
+        return;
+      }
+      autoRoute.checked = true;
+      webTouched = false;
+      engineTouched = false;
+      paintTasks();
+      promptBox.value = sentence;
+      addChatLine("You", sentence);
+      chatInput.value = "";
+      chatAnswer = null;
+      chatNote.textContent = "Reading your sentence...";
+      chatShouldRun = true;
+      scheduleEstimate();
+    }
+
+    function showAnswer(text) {
+      if (text === null || text === undefined) {
+        lastAnswer = "";
+      } else {
+        lastAnswer = String(text);
+      }
+      paintResult(lastAnswer);
+      showChatAnswer(lastAnswer);
+    }
+
+    function clearResult() {
+      resultStamp = resultStamp + 1;
+      showAnswer("");
+      warningLine.textContent = "";
+      if (runButton.disabled === false) {
+        statusLine.textContent = "";
+      }
+      showPlannedTask(taskName(selectedTask));
+    }
+
+    browseFiles.addEventListener("click", function () {
+      fileInput.click();
+    });
+    fileInput.addEventListener("change", function () {
+      addFiles(fileInput.files);
+      fileInput.value = "";
+    });
+    dropZone.addEventListener("dragover", function (event) {
+      event.preventDefault();
+      dropZone.classList.add("border-teal-600");
+    });
+    dropZone.addEventListener("dragleave", function () {
+      dropZone.classList.remove("border-teal-600");
+    });
+    dropZone.addEventListener("drop", function (event) {
+      event.preventDefault();
+      dropZone.classList.remove("border-teal-600");
+      addFiles(event.dataTransfer.files);
+    });
+    promptBox.addEventListener("input", scheduleEstimate);
+    autoRoute.addEventListener("change", function () {
+      paintTasks();
+      scheduleEstimate();
+    });
+    rateTier.addEventListener("change", scheduleEstimate);
+    webSearch.addEventListener("change", function () {
+      webTouched = true;
+      paintWebSearch();
+      scheduleEstimate();
+    });
+    function showStreamText(text, stamp) {
+      if (stamp !== resultStamp) {
+        return;
+      }
+      lastAnswer = text;
+      paintResult(text);
+      showChatAnswer(text);
+    }
+
+    function finishRun(data, stamp) {
+      if (stamp !== resultStamp) {
+        setRunIdle();
+        statusLine.textContent = "";
+        powerBusy = false;
+        loadPower();
+        return;
+      }
+      setRunIdle();
+      statusLine.textContent = "";
+      powerBusy = false;
+      loadPower();
+      if (data.error) {
+        warningLine.textContent = data.error;
+        return;
+      }
+      showAnswer(data.text);
+      if (data.warning) {
+        warningLine.textContent = data.warning;
+      } else {
+        warningLine.textContent = "";
+      }
+      taskLabel.textContent = "Ran as: " + data.task_name;
+      chatNote.textContent = taskLabel.textContent;
+      loadSummary();
+      if (logsBackdrop.classList.contains("hidden") === false) {
+        loadLogs();
+      }
+    }
+
+    function handleEventBlock(block, streamText, stamp) {
+      var line = block.trim();
+      if (line.indexOf("data:") !== 0) {
+        return streamText;
+      }
+      var raw = line.substring(5).trim();
+      if (raw === "") {
+        return streamText;
+      }
+      var data = null;
+      try {
+        data = JSON.parse(raw);
+      } catch (err) {
+        return streamText;
+      }
+      if (data.error) {
+        finishRun(data, stamp);
+        return streamText;
+      }
+      if (data.text_piece) {
+        if (stamp === resultStamp) {
+          if (statusLine.textContent !== "Stopping..." && statusLine.textContent !== "Stopped.") {
+            statusLine.textContent = "Writing...";
+          }
+        }
+        streamText = streamText + data.text_piece;
+        showStreamText(streamText, stamp);
+        return streamText;
+      }
+      if (data.stopped) {
+        if (stamp !== resultStamp) {
+          setRunIdle();
+          statusLine.textContent = "";
+          powerBusy = false;
+          loadPower();
+          return streamText;
+        }
+        setRunIdle();
+        statusLine.textContent = "Stopped.";
+        chatNote.textContent = "Stopped.";
+        powerBusy = false;
+        loadPower();
+        return streamText;
+      }
+      if (data.done) {
+        finishRun(data, stamp);
+      }
+      return streamText;
+    }
+
+    function readRunStream(response, stamp) {
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = "";
+      var streamText = "";
+      function pump() {
+        return reader.read().then(function (packet) {
+          if (packet.done) {
+            if (buffer.trim() !== "") {
+              handleEventBlock(buffer, streamText, stamp);
+            }
+            setRunIdle();
+            if (stamp !== resultStamp) {
+              statusLine.textContent = "";
+            }
+            return;
+          }
+          buffer = buffer + decoder.decode(packet.value, { stream: true });
+          var parts = buffer.split("\n\n");
+          buffer = parts.pop();
+          var index = 0;
+          while (index < parts.length) {
+            streamText = handleEventBlock(parts[index], streamText, stamp);
+            index = index + 1;
+          }
+          return pump();
+        });
+      }
+      return pump();
+    }
+
+    stopButton.addEventListener("click", function () {
+      if (stopButton.disabled) {
+        return;
+      }
+      stopButton.disabled = true;
+      statusLine.textContent = "Stopping...";
+      var body = {};
+      body.run_id = currentRunId;
+      fetch("/api/stop", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).catch(function () {
+        stopButton.disabled = false;
+        statusLine.textContent = "Stop could not reach the model.";
+      });
+    });
+
+    runButton.addEventListener("click", function () {
+      var stamp = resultStamp;
+      currentRunId = String(Date.now());
+      runButton.disabled = true;
+      stopButton.disabled = false;
+      statusLine.textContent = "Working on this Mac...";
+      warningLine.textContent = "";
+      if (airmaxPower.getAttribute("aria-pressed") !== "true") {
+        powerBusy = true;
+        paintPower("loading");
+      }
+      fetch("/api/run", { method: "POST", body: formData() })
+        .then(function (response) {
+          var contentType = response.headers.get("content-type");
+          if (contentType && contentType.indexOf("text/event-stream") !== -1) {
+            return readRunStream(response, stamp);
+          }
+          return response.json().then(function (data) {
+            finishRun(data, stamp);
+          });
+        })
+        .catch(function () {
+          if (stamp !== resultStamp) {
+            setRunIdle();
+            statusLine.textContent = "";
+            powerBusy = false;
+            loadPower();
+            return;
+          }
+          setRunIdle();
+          statusLine.textContent = "";
+          powerBusy = false;
+          loadPower();
+          warningLine.textContent = "This task could not be finished on this Mac.";
+        });
+    });
+    function showCopied() {
+      copyButton.textContent = "Copied";
+      setTimeout(function () {
+        copyButton.textContent = "Copy Result";
+      }, 1200);
+    }
+
+    function copyWithFallback(text) {
+      var area = document.createElement("textarea");
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      var worked = false;
+      try {
+        worked = document.execCommand("copy");
+      } catch (err) {
+        worked = false;
+      }
+      document.body.removeChild(area);
+      if (worked) {
+        showCopied();
+      }
+    }
+
+    copyButton.addEventListener("click", function () {
+      var text = "";
+      if (lastAnswer !== "") {
+        text = output.innerText;
+      }
+      showCopied();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(function () {
+          copyWithFallback(text);
+        });
+      } else {
+        copyWithFallback(text);
+      }
+    });
+    clearButton.addEventListener("click", function () {
+      clearResult();
+    });
+    openChatButton.addEventListener("click", openChatPanel);
+    closeChat.addEventListener("click", closeChatPanel);
+    sendChat.addEventListener("click", sendChatSentence);
+    chatInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && event.shiftKey === false) {
+        event.preventDefault();
+        sendChatSentence();
+      }
+    });
+    chatModal.addEventListener("click", function (event) {
+      if (event.target === chatModal) {
+        closeChatPanel();
+      }
+    });
+    openReceipt.addEventListener("click", openReceiptPanel);
+    closeReceipt.addEventListener("click", closeReceiptPanel);
+    receiptModal.addEventListener("click", function (event) {
+      if (event.target === receiptModal) {
+        closeReceiptPanel();
+      }
+    });
+    airmaxPower.addEventListener("click", function () {
+      var turnOn = true;
+      if (airmaxPower.getAttribute("aria-pressed") === "true") {
+        turnOn = false;
+      }
+      setPower(turnOn);
+    });
+    var engineButtons = document.querySelectorAll("#engineSwitch button");
+    var engineIndex = 0;
+    while (engineIndex < engineButtons.length) {
+      engineButtons[engineIndex].addEventListener("click", function (event) {
+        if (powerBusy) {
+          return;
+        }
+        var engine = event.currentTarget.getAttribute("data-engine");
+        if (engine === selectedEngine) {
+          return;
+        }
+        engineTouched = true;
+        selectedEngine = engine;
+        paintEngine();
+        showPlannedTask(taskName(selectedTask));
+        scheduleEstimate();
+        if (airmaxPower.getAttribute("aria-pressed") === "true") {
+          setPower(true);
+        }
+      });
+      engineIndex = engineIndex + 1;
+    }
+    openLogs.addEventListener("click", openLogsPanel);
+    closeLogs.addEventListener("click", closeLogsPanel);
+    logsBackdrop.addEventListener("click", function (event) {
+      var drawer = document.getElementById("logsDrawer");
+      if (drawer.contains(event.target)) {
+        return;
+      }
+      closeLogsPanel();
+    });
+    deleteAllLogs.addEventListener("click", function () {
+      var sure = window.confirm("Delete all run logs?");
+      if (sure === false) {
+        return;
+      }
+      fetch("/logs", { method: "DELETE" })
+        .then(function () { loadLogs(); });
+    });
+
+    paintTasks();
+    paintWebSearch();
+    showAnswer("");
+    paintEngine();
+    showPlannedTask(taskName(selectedTask));
+    paintPower("off");
+    loadPower();
+    loadSummary();
+    loadDemos();
+    scheduleEstimate();
+  </script>
+</body>
+</html>

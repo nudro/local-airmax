@@ -1,0 +1,46 @@
+---
+description: Local AirMax rules for the six-file cap, plain Python, 16GB memory, and allowed models
+alwaysApply: true
+---
+
+# Local AirMax
+
+Local AirMax is a small local control panel. Keep it readable by a beginner.
+
+## File cap
+
+Application code and config stay in these six files only:
+
+- `requirements.txt`
+- `config.py`
+- `brain.py`
+- `app.py`
+- `index.html`
+- `convert_lora.py`
+
+`README.md` and this rule file are allowed. Do not add another Python module, template, or config file. Runtime files such as `savings.db`, `uploads/`, and `adapters/` are created by the app and are not extra source files. The two staged articles in `demo/` are content, not extra application files.
+
+## Plain Python
+
+- Use plain functions and dictionaries. Pass `dict`, `list`, `str`, `int`, and `float`.
+- Do not use `@dataclass`, `@property`, `@classmethod`, `@staticmethod`, `@lru_cache`, custom decorators, metaclasses, generators, `async`/`await`, or abstract base classes.
+- The only decorator allowed is `@app.route` in `app.py`.
+- `LocalMLXModel.request` is the one exception: PydanticAI requires that method to be `async`. Its body calls the existing synchronous MLX generate. Do not add other async functions. `model_name` and `system` are plain class attributes because the library reads them.
+- Do not write nested list or dict comprehensions, walrus operators, or ternary chains. Use `for` loops and `if` / `elif` / `else`.
+- Put a one or two sentence comment above every function, in everyday English.
+
+## Memory on a 16GB Mac
+
+- Keep one language model loaded at a time. Unload it and clear the MLX cache before loading another.
+- Gemma 4 12B is the only base model that may take a LoRA adapter. Never pass an adapter path for Granite, Gemma 4 E4B, or Llama.
+- The model switch is named by the job. Summaries loads Llama 3.2 3B. Writing loads Gemma 4 E4B. Analysis loads Granite 4.2 8B 4-bit. Precision loads Gemma 4 12B and may attach `adapters/<task_id>`.
+- Summaries, Writing, and Analysis never take an adapter. Only one language model is loaded at a time.
+- Run EmbeddingGemma only inside a `multiprocessing` spawn child. The child must exit before a language model is loaded.
+- Long documents are summarized in short pieces. Do not send a 16k–32k prompt through Gemma in one call.
+- Web search is off unless the person turns it on. When it is on, only the search query leaves the Mac. Uploaded files stay local. When it is off, do not call DuckDuckGo.
+
+## Models
+
+Use US and European open-weight models only: Google Gemma, Google EmbeddingGemma, IBM Granite, Meta Llama, and SentenceTransformers MiniLM.
+
+Do not add Qwen, DeepSeek, GLM, Yi, or other Chinese models.
